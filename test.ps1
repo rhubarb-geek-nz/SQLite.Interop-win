@@ -18,7 +18,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.113.0"
+$VERSION = "1.0.114.0"
 $TOOLS = "sqlite-tools-win32-x86-3390400"
 
 $ErrorActionPreference = "Stop"
@@ -102,10 +102,10 @@ if (-not(Test-Path "runtimes"))
 
 switch ( "$env:PROCESSOR_ARCHITECTURE" )
 {
-	"x86"   { Copy-Item -LiteralPath "runtimes\win-x86\native\netstandard2.0\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
-	"AMD64" { Copy-Item -LiteralPath "runtimes\win-x64\native\netstandard2.0\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
-	"ARM"   { Copy-Item -LiteralPath "runtimes\win-arm\native\netstandard2.0\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
-	"ARM64" { Copy-Item -LiteralPath "runtimes\win-arm64\native\netstandard2.0\SQLite.Interop.dll" -Destination "bin\Release\net6.0" }
+	"x86"   { Copy-Item -LiteralPath "runtimes\win-x86\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
+	"AMD64" { Copy-Item -LiteralPath "runtimes\win-x64\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
+	"ARM"   { Copy-Item -LiteralPath "runtimes\win-arm\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
+	"ARM64" { Copy-Item -LiteralPath "runtimes\win-arm64\native\SQLite.Interop.dll" -Destination "bin\Release\net6.0" }
 	default { throw "Unknown architecure" }
 }
 
