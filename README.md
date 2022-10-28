@@ -4,7 +4,7 @@ This project builds SQLite.Interop.dll as platform specific binaries for `win-ar
 
 The `package.ps1` script will build from the versioned source for [System.Data.SQLite](https://system.data.sqlite.org). See script for URL and SHA256.
 
-The `test.ps1` script will use both `sqlite3` and `dotnet` to perform a test of the binary dll. The `test.csproj` uses the [NuGet System.Data.SQLite.Core](https://www.nuget.org/packages/System.Data.SQLite.Core/) package.
+The `test.ps1` script will use both `sqlite3` and `dotnet` to perform a test of the binary dll. `test.csproj` uses the [NuGet System.Data.SQLite.Core](https://www.nuget.org/packages/System.Data.SQLite.Core/) to compile. `test.ps1` uses [Precompiled Binaries for the .NET Standard 2.0](https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki) to execute.
 
 The project requires
 

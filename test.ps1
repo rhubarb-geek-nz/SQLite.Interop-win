@@ -18,7 +18,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.115.0"
+$VERSION = "1.0.115.5"
+$SHA256 = "AA9BB9E397685CF67E7FAF286A90BB6B88A3E2AC9A944CF833FC4BAB056B2830"
+$ZIPNAME = "sqlite-netStandard20-binary-$VERSION.zip"
 $TOOLS = "sqlite-tools-win32-x86-3390400"
 
 $ErrorActionPreference = "Stop"
@@ -107,6 +109,40 @@ switch ( "$env:PROCESSOR_ARCHITECTURE" )
 	"ARM"   { Copy-Item -LiteralPath "runtimes\win-arm\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
 	"ARM64" { Copy-Item -LiteralPath "runtimes\win-arm64\native\SQLite.Interop.dll" -Destination "bin\Release\net6.0" }
 	default { throw "Unknown architecure" }
+}
+
+Write-Host "Following should fail with missing entry point SIa069da76968b7553 in SQLite.Interop.dll"
+
+& "dotnet.exe" "bin\Release\net6.0\test.dll"
+
+If ( $LastExitCode -eq 0 )
+{
+	throw "This should have failed with missing entry point SIa069da76968b7553 in SQLite.Interop.dll"
+}
+
+if (-not(Test-Path -Path $ZIPNAME))
+{
+	Invoke-WebRequest -Uri "https://system.data.sqlite.org/blobs/$VERSION/$ZIPNAME" -OutFile $ZIPNAME
+}
+
+Remove-Item "bin\Release\net6.0\System.Data.SQLite.dll"
+
+$null = New-Item -Path "." -Name "tmp" -ItemType "directory"
+
+try
+{
+	Expand-Archive -LiteralPath "$ZIPNAME" -DestinationPath "tmp"
+
+	if ((Get-FileHash -LiteralPath $ZIPNAME -Algorithm "SHA256").Hash -ne $SHA256)
+	{
+		throw "SHA256 mismatch for $ZIPNAME"
+	}
+
+	$null = Move-Item -Path "tmp\System.Data.SQLite.dll" -Destination "bin\Release\net6.0"
+}
+finally
+{
+	Remove-Item "tmp" -Force -Recurse
 }
 
 Write-Host "Following should succeed and read the database"
