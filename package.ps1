@@ -18,8 +18,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.111.0"
-$SHA256 = "C6C308CCB2718B18F543CF2E7E8490EC6284854B6397BF20D9EDE462F6FF2FFC"
+$VERSION = "1.0.112.0"
+$SHA256 = "F5C06D72D67AB3DDCEB15D59174501798249540BEAD8F3FC818C974DE28F511A"
 $ZIPNAME = "sqlite-netFx-source-$VERSION.zip"
 $INTEROP_RC_VERSION = $VERSION.Replace('.',',')
 
@@ -80,7 +80,6 @@ Get-ChildItem -Path "src\SQLite.Interop\src\contrib" -Filter *.c -Recurse | fore
 		[System.IO.File]::WriteAllText($FileName, $Content, $Utf8NoBomEncoding)
 	}
 }
-
 
 (
 	( "x86","${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"),
