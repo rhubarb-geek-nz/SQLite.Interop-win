@@ -18,7 +18,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.112.0"
+$VERSION = "1.0.113.0"
 $TOOLS = "sqlite-tools-win32-x86-3390400"
 
 $ErrorActionPreference = "Stop"

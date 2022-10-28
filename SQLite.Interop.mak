@@ -28,7 +28,6 @@ CC_OPTIONS= /DWINVER=0x600 \
 		/I$(SRCDIR)\core \
 		/DINTEROP_PLACEHOLDER=1 \
 		/DINTEROP_EXTENSION_FUNCTIONS=1 \
-		/DINTEROP_CODEC=1 \
 		/DINTEROP_VIRTUAL_TABLE=1 \
 		/DINTEROP_FTS5_EXTENSION=1 \
 		/DINTEROP_PERCENTILE_EXTENSION=1 \
@@ -80,7 +79,6 @@ $(BINDIR)\SQLite.Interop.dll: $(OBJDIR)\SQLite.Interop.res $(OBJDIR)\interop.obj
 		$(OBJDIR)\interop.obj \
 		/link \
 		/INCREMENTAL:NO \
-		advapi32.lib \
 		/NOLOGO \
 		$(OBJDIR)\SQLite.Interop.res \
 		/ASSEMBLYRESOURCE:$(RESDIR)\System.Data.SQLite\Resources\SQLiteCommand.bmp,System.Data.SQLite.SQLiteCommand.bmp \

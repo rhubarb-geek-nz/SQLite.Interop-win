@@ -18,8 +18,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.112.0"
-$SHA256 = "F5C06D72D67AB3DDCEB15D59174501798249540BEAD8F3FC818C974DE28F511A"
+$VERSION = "1.0.113.0"
+$SHA256 = "16E3B1B1112BBD2665C743EDE20DEC3CEFD6D05BF8EE5DDC3DE3EDB7D28CBA28"
 $ZIPNAME = "sqlite-netFx-source-$VERSION.zip"
 $INTEROP_RC_VERSION = $VERSION.Replace('.',',')
 
@@ -108,6 +108,10 @@ EXIT %ERRORLEVEL%
 	$null = New-Item -Path "." -Name "$RIDDIR" -ItemType "directory"
 
 	$null = Move-Item -Path "bin\$ARCH\SQLite.Interop.dll" -Destination "$RIDDIR"
+
+	$null = New-Item -Path "." -Name "runtimes\$RID\native\netstandard2.1" -ItemType "directory"
+
+	$null = Copy-Item -Path "$RIDDIR\SQLite.Interop.dll" -Destination "runtimes\$RID\native\netstandard2.1"
 }
 
 Compress-Archive -DestinationPath "SQLite.Interop-$VERSION-win.zip" -LiteralPath "runtimes"
