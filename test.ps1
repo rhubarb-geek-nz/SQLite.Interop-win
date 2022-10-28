@@ -18,8 +18,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.115.5"
-$SHA256 = "AA9BB9E397685CF67E7FAF286A90BB6B88A3E2AC9A944CF833FC4BAB056B2830"
+$VERSION = "1.0.116.0"
+$SHA256 = "65B2AFA42C53F61F85F775BB1236C13C7A5A300A648B32BE73F09B90AB898651"
 $ZIPNAME = "sqlite-netStandard20-binary-$VERSION.zip"
 $TOOLS = "sqlite-tools-win32-x86-3390400"
 
@@ -111,13 +111,13 @@ switch ( "$env:PROCESSOR_ARCHITECTURE" )
 	default { throw "Unknown architecure" }
 }
 
-Write-Host "Following should fail with missing entry point SIa069da76968b7553 in SQLite.Interop.dll"
+Write-Host "Following should fail with missing entry point SI7fca2652f71267db in SQLite.Interop.dll"
 
 & "dotnet.exe" "bin\Release\net6.0\test.dll"
 
 If ( $LastExitCode -eq 0 )
 {
-	throw "This should have failed with missing entry point SIa069da76968b7553 in SQLite.Interop.dll"
+	throw "This should have failed with missing entry point SI7fca2652f71267db in SQLite.Interop.dll"
 }
 
 if (-not(Test-Path -Path $ZIPNAME))
