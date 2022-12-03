@@ -18,10 +18,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-$VERSION = "1.0.116.0"
-$SHA256 = "65B2AFA42C53F61F85F775BB1236C13C7A5A300A648B32BE73F09B90AB898651"
+$VERSION = "1.0.117.0"
+$SHA256 = "D35CB72316BF55349305FB0698C52C8B8117127A3211FF163C288FA2A7F9B633"
 $ZIPNAME = "sqlite-netStandard20-binary-$VERSION.zip"
-$TOOLS = "sqlite-tools-win32-x86-3390400"
+$TOOLS = "sqlite-tools-win32-x86-3400000"
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
