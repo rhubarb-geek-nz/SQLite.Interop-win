@@ -18,10 +18,15 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
+param(
+	$CertificateThumbprint = '601A8B683F791E51F647D34AD102C38DA4DDB65F'
+)
+
 $VERSION = "1.0.118.0"
 $SHA256 = "BB599FA265088ABB8A7D4AF6218CAE97DF8B9C8ED6F04FB940A5D564920EE6A1"
 $ZIPNAME = "sqlite-netFx-source-$VERSION.zip"
 $INTEROP_RC_VERSION = $VERSION.Replace('.',',')
+$VCVARSDIR = "${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build"
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -31,8 +36,44 @@ trap
 	throw $PSItem
 }
 
-foreach ($Name in "bin", "obj", "runtimes", "SQLite.Interop-$VERSION-win.zip") {
-	if (Test-Path "$Name") {
+$VCVARSARM = 'vcvarsarm.bat'
+$VCVARSARM64 = 'vcvarsarm64.bat'
+$VCVARSAMD64 = 'vcvars64.bat'
+$VCVARSX86 = 'vcvars32.bat'
+$VCVARSHOST = 'vcvars32.bat'
+
+switch ($Env:PROCESSOR_ARCHITECTURE)
+{
+	'AMD64' {
+		$VCVARSX86 = 'vcvarsamd64_x86.bat'
+		$VCVARSARM = 'vcvarsamd64_arm.bat'
+		$VCVARSARM64 = 'vcvarsamd64_arm64.bat'
+		$VCVARSHOST = $VCVARSAMD64
+	}
+	'ARM64' {
+		$VCVARSX86 = 'vcvarsarm64_x86.bat'
+		$VCVARSARM = 'vcvarsarm64_arm.bat'
+		$VCVARSAMD64 = 'vcvarsarm64_amd64.bat'
+		$VCVARSHOST = $VCVARSARM64
+	}
+	'X86' {
+		$VCVARSXARM64 = 'vcvarsx86_arm64.bat'
+		$VCVARSARM = 'vcvarsx86_arm.bat'
+		$VCVARSAMD64 = 'vcvarsx86_amd64.bat'
+	}
+	Default {
+		throw "Unknown architecture $Env:PROCESSOR_ARCHITECTURE"
+	}
+}
+
+$VCVARSARCH = @{'arm' = $VCVARSARM; 'arm64' = $VCVARSARM64; 'x86' = $VCVARSX86; 'x64' = $VCVARSAMD64}
+
+$VCVARSARCH | Format-Table -Property @{ l='Architecture'; e={$_.Name}},@{ l='Environment'; e={$_.Value}}
+
+foreach ($Name in "bin", "obj", "runtimes", "SQLite.Interop-$VERSION-win.zip")
+{
+	if (Test-Path "$Name")
+	{
 		Remove-Item "$Name" -Force -Recurse
 	} 
 }
@@ -81,19 +122,16 @@ Get-ChildItem -Path "src\SQLite.Interop\src\contrib" -Filter *.c -Recurse | fore
 	}
 }
 
-(
-	( "x86","${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"),
-	( "x64","${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"),
-	( "arm","${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat"),
-	( "arm64","${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat")
-) | foreach {
-	$ARCH = $_[0]
-	$VCVARS = $_[1]
+foreach ( $ARCH in 'x86', 'x64', 'arm', 'arm64' )
+{
+	$VCVARS = $VCVARSARCH[$ARCH]
 
 	@"
-CALL "$VCVARS"
+CALL "$VCVARSDIR\$VCVARS"
 IF ERRORLEVEL 1 EXIT %ERRORLEVEL%
 NMAKE /NOLOGO -f SQLite.Interop.mak INTEROP_RC_VERSION="$INTEROP_RC_VERSION" SRCROOT="src"
+IF ERRORLEVEL 1 EXIT %ERRORLEVEL%
+signtool sign /a /sha1 "$CertificateThumbprint" /fd SHA256 /t http://timestamp.digicert.com "bin\$ARCH\SQLite.Interop.dll"
 EXIT %ERRORLEVEL%
 "@ | & "$env:COMSPEC"
 
@@ -111,5 +149,29 @@ EXIT %ERRORLEVEL%
 }
 
 Compress-Archive -DestinationPath "SQLite.Interop-$VERSION-win.zip" -LiteralPath "runtimes"
+
+('arm', 'arm64', 'x86', 'x64') | ForEach-Object {
+	$ARCH = $_
+	$VCVARS = ( '{0}\{1}' -f $VCVARSDIR, $VCVARSARCH[$ARCH] )
+	$EXE = "runtimes\win-$ARCH\native\SQLite.Interop.dll"
+
+	$MACHINE = ( @"
+@CALL "$VCVARS" > NUL:
+IF ERRORLEVEL 1 EXIT %ERRORLEVEL%
+dumpbin /headers $EXE
+IF ERRORLEVEL 1 EXIT %ERRORLEVEL%
+EXIT %ERRORLEVEL%
+"@ | & "$env:COMSPEC" /nologo /Q | Select-String -Pattern " machine " )
+
+	$MACHINE = $MACHINE.ToString().Trim()
+
+	$MACHINE = $MACHINE.Substring($MACHINE.LastIndexOf(' ')+1)
+
+	New-Object PSObject -Property @{
+			Architecture=$ARCH;
+			Executable=$EXE;
+			Machine=$MACHINE
+	}
+} | Format-Table -Property Architecture, Executable, Machine
 
 Write-Host "Build complete"
