@@ -111,13 +111,13 @@ switch ( "$env:PROCESSOR_ARCHITECTURE" )
 	default { throw "Unknown architecure" }
 }
 
-Write-Host "Following should fail with missing entry point SI7fca2652f71267db in SQLite.Interop.dll"
+Write-Host "Following should fail with missing entry point SI606edd9d386f5df5 in SQLite.Interop.dll"
 
 & "dotnet.exe" "bin\Release\net6.0\test.dll"
 
 If ( $LastExitCode -eq 0 )
 {
-	throw "This should have failed with missing entry point SI7fca2652f71267db in SQLite.Interop.dll"
+	throw "This should have failed with missing entry point SI606edd9d386f5df5 in SQLite.Interop.dll"
 }
 
 if (-not(Test-Path -Path $ZIPNAME))
