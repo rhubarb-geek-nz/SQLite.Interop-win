@@ -26,7 +26,6 @@ $VERSION = "1.0.118.0"
 $SHA256 = "BB599FA265088ABB8A7D4AF6218CAE97DF8B9C8ED6F04FB940A5D564920EE6A1"
 $ZIPNAME = "sqlite-netFx-source-$VERSION.zip"
 $INTEROP_RC_VERSION = $VERSION.Replace('.',',')
-$VCVARSDIR = "${Env:ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build"
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
@@ -34,6 +33,16 @@ $ProgressPreference = "SilentlyContinue"
 trap
 {
 	throw $PSItem
+}
+
+foreach ($EDITION in 'Community', 'Professional')
+{
+	$VCVARSDIR = "${Env:ProgramFiles}\Microsoft Visual Studio\2022\$EDITION\VC\Auxiliary\Build"
+
+	if ( Test-Path -LiteralPath $VCVARSDIR -PathType Container )
+	{
+		break
+	}
 }
 
 $VCVARSARM = 'vcvarsarm.bat'
@@ -68,7 +77,20 @@ switch ($Env:PROCESSOR_ARCHITECTURE)
 
 $VCVARSARCH = @{'arm' = $VCVARSARM; 'arm64' = $VCVARSARM64; 'x86' = $VCVARSX86; 'x64' = $VCVARSAMD64}
 
-$VCVARSARCH | Format-Table -Property @{ l='Architecture'; e={$_.Name}},@{ l='Environment'; e={$_.Value}}
+$ARCHLIST = ( $VCVARSARCH.Keys | ForEach-Object {
+	$VCVARS = $VCVARSARCH[$_];
+	if ( Test-Path -LiteralPath "$VCVARSDIR/$VCVARS" -PathType Leaf )
+	{
+		$_
+	}
+} | Sort-Object )
+
+$ARCHLIST | ForEach-Object {
+	New-Object PSObject -Property @{
+			Architecture=$_;
+			Environment=$VCVARSARCH[$_]
+	}
+} | Format-Table -Property Architecture,'Environment'
 
 foreach ($Name in "bin", "obj", "runtimes", "SQLite.Interop-$VERSION-win.zip")
 {
@@ -122,7 +144,7 @@ Get-ChildItem -Path "src\SQLite.Interop\src\contrib" -Filter *.c -Recurse | fore
 	}
 }
 
-foreach ( $ARCH in 'x86', 'x64', 'arm', 'arm64' )
+foreach ( $ARCH in $ARCHLIST )
 {
 	$VCVARS = $VCVARSARCH[$ARCH]
 
@@ -150,7 +172,7 @@ EXIT %ERRORLEVEL%
 
 Compress-Archive -DestinationPath "SQLite.Interop-$VERSION-win.zip" -LiteralPath "runtimes"
 
-('arm', 'arm64', 'x86', 'x64') | ForEach-Object {
+$ARCHLIST | ForEach-Object {
 	$ARCH = $_
 	$VCVARS = ( '{0}\{1}' -f $VCVARSDIR, $VCVARSARCH[$ARCH] )
 	$EXE = "runtimes\win-$ARCH\native\SQLite.Interop.dll"
