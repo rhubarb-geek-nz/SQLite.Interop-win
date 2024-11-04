@@ -9,8 +9,8 @@ The `test.ps1` script will use both `sqlite3` and `dotnet` to perform a test of 
 The project requires
 
 - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/), Community Edition is sufficient
-- [PowerShell](https://github.com/PowerShell/PowerShell), tested with 7.4.0
-- [.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0), full SDK required
+- [PowerShell](https://github.com/PowerShell/PowerShell), tested with 7.4.5
+- [.NET 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0), full SDK required
 
 These scripts are licensed using [GPLv3](http://www.gnu.org/licenses). [SQLite is public domain](https://www.sqlite.org/copyright.html).
 
