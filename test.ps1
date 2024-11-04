@@ -78,7 +78,7 @@ if (("$env:PROCESSOR_ARCHITECTURE" -eq "x86") -or ("$env:PROCESSOR_ARCHITECTURE"
 {
 	Write-Host "Following should succeed and read the database"
 
-	& "dotnet.exe" "bin\Release\net6.0\test.dll"
+	& "dotnet.exe" "bin\Release\net8.0\test.dll"
 
 	If ( $LastExitCode -ne 0 )
 	{
@@ -86,11 +86,11 @@ if (("$env:PROCESSOR_ARCHITECTURE" -eq "x86") -or ("$env:PROCESSOR_ARCHITECTURE"
 	}
 }
 
-Remove-Item "bin\Release\net6.0\runtimes" -Force -Recurse
+Remove-Item "bin\Release\net8.0\runtimes" -Force -Recurse
 
 Write-Host "Following should fail with missing SQLite.Interop.dll"
 
-& "dotnet.exe" "bin\Release\net6.0\test.dll"
+& "dotnet.exe" "bin\Release\net8.0\test.dll"
 
 If ( $LastExitCode -eq 0 )
 {
@@ -104,16 +104,16 @@ if (-not(Test-Path "runtimes"))
 
 switch ( "$env:PROCESSOR_ARCHITECTURE" )
 {
-	"x86"   { Copy-Item -LiteralPath "runtimes\win-x86\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
-	"AMD64" { Copy-Item -LiteralPath "runtimes\win-x64\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
-	"ARM"   { Copy-Item -LiteralPath "runtimes\win-arm\native\SQLite.Interop.dll"   -Destination "bin\Release\net6.0" }
-	"ARM64" { Copy-Item -LiteralPath "runtimes\win-arm64\native\SQLite.Interop.dll" -Destination "bin\Release\net6.0" }
+	"x86"   { Copy-Item -LiteralPath "runtimes\win-x86\native\SQLite.Interop.dll"   -Destination "bin\Release\net8.0" }
+	"AMD64" { Copy-Item -LiteralPath "runtimes\win-x64\native\SQLite.Interop.dll"   -Destination "bin\Release\net8.0" }
+	"ARM"   { Copy-Item -LiteralPath "runtimes\win-arm\native\SQLite.Interop.dll"   -Destination "bin\Release\net8.0" }
+	"ARM64" { Copy-Item -LiteralPath "runtimes\win-arm64\native\SQLite.Interop.dll" -Destination "bin\Release\net8.0" }
 	default { throw "Unknown architecure" }
 }
 
 Write-Host "Following should fail with missing entry point SI606edd9d386f5df5 in SQLite.Interop.dll"
 
-& "dotnet.exe" "bin\Release\net6.0\test.dll"
+& "dotnet.exe" "bin\Release\net8.0\test.dll"
 
 If ( $LastExitCode -eq 0 )
 {
@@ -125,7 +125,7 @@ if (-not(Test-Path -Path $ZIPNAME))
 	Invoke-WebRequest -Uri "https://system.data.sqlite.org/blobs/$VERSION/$ZIPNAME" -OutFile $ZIPNAME
 }
 
-Remove-Item "bin\Release\net6.0\System.Data.SQLite.dll"
+Remove-Item "bin\Release\net8.0\System.Data.SQLite.dll"
 
 $null = New-Item -Path "." -Name "tmp" -ItemType "directory"
 
@@ -138,7 +138,7 @@ try
 		throw "SHA256 mismatch for $ZIPNAME"
 	}
 
-	$null = Move-Item -Path "tmp\System.Data.SQLite.dll" -Destination "bin\Release\net6.0"
+	$null = Move-Item -Path "tmp\System.Data.SQLite.dll" -Destination "bin\Release\net8.0"
 }
 finally
 {
@@ -147,7 +147,7 @@ finally
 
 Write-Host "Following should succeed and read the database"
 
-& "dotnet.exe" "bin\Release\net6.0\test.dll"
+& "dotnet.exe" "bin\Release\net8.0\test.dll"
 
 If ( $LastExitCode -ne 0 )
 {
